@@ -1,161 +1,80 @@
 # -*- coding: utf-8 -*-
 import streamlit as st
 import requests
+import json
 
 # -----------------------------------
 # تحميل بيانات الجدول الدوري الرسمية
 # -----------------------------------
 
 URL = "https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json"
-data = requests.get(URL).json()
-elements = data["elements"]
+elements = requests.get(URL).json()["elements"]
 
 # -----------------------------------
-# ترجمة تلقائية عربي → إنجليزي
-# (قاعدة واسعة – قابلة للتوسيع)
+# تحميل أماكن الوجود في الطبيعة من ملف خارجي
 # -----------------------------------
 
-arabic_map = {
-    "هيدروجين": "hydrogen",
-    "هيليوم": "helium",
-    "ليثيوم": "lithium",
-    "بيريليوم": "beryllium",
-    "بورون": "boron",
-    "كربون": "carbon",
-    "نيتروجين": "nitrogen",
-    "أكسجين": "oxygen",
-    "اوكسجين": "oxygen",
-    "فلور": "fluorine",
-    "نيون": "neon",
-    "صوديوم": "sodium",
-    "مغنيسيوم": "magnesium",
-    "ألمنيوم": "aluminum",
-    "المنيوم": "aluminum",
-    "سيليكون": "silicon",
-    "فوسفور": "phosphorus",
-    "كبريت": "sulfur",
-    "كلور": "chlorine",
-    "أرجون": "argon",
-    "بوتاسيوم": "potassium",
-    "كالسيوم": "calcium",
-    "حديد": "iron",
-    "نحاس": "copper",
-    "زنك": "zinc",
-    "فضة": "silver",
-    "ذهب": "gold",
-    "زئبق": "mercury",
-    "رصاص": "lead"
-}
+with open("pp.json", "r", encoding="utf-8") as f:
+    occurrence_data = json.load(f)
 
 # -----------------------------------
-# تنظيف النص
+# ترجمة عربي → إنجليزي
 # -----------------------------------
 
-def normalize(text):
-    text = text.strip().lower()
-    if text.startswith("ال"):
-        text = text[2:]
-    return text
-
-# -----------------------------------
-# ألوان حسب التصنيف
-# -----------------------------------
-
-category_colors = {
-    "alkali metal": "#ff6666",
-    "alkaline earth metal": "#ffdead",
-    "transition metal": "#ffc0c0",
-    "post-transition metal": "#cccccc",
-    "metalloid": "#cccc99",
-    "nonmetal": "#a0ffa0",
-    "halogen": "#ffff99",
-    "noble gas": "#c0ffff",
-    "lanthanide": "#ffbfff",
-    "actinide": "#ff99cc"
+arabic_to_english = {
+    "هيدروجين":"hydrogen","هيليوم":"helium","ليثيوم":"lithium","بيريليوم":"beryllium",
+    "بورون":"boron","كربون":"carbon","نيتروجين":"nitrogen","أكسجين":"oxygen","اوكسجين":"oxygen",
+    "فلور":"fluorine","نيون":"neon","صوديوم":"sodium","مغنيسيوم":"magnesium","ألمنيوم":"aluminum",
+    "المنيوم":"aluminum","سيليكون":"silicon","فوسفور":"phosphorus","كبريت":"sulfur","كلور":"chlorine",
+    "أرجون":"argon","بوتاسيوم":"potassium","كالسيوم":"calcium","حديد":"iron","نحاس":"copper",
+    "فضة":"silver","ذهب":"gold","زئبق":"mercury","رصاص":"lead","يورانيوم":"uranium",
+    "أوغانيسون":"oganesson"
 }
 
 # -----------------------------------
 # إعداد الصفحة
 # -----------------------------------
 
-st.set_page_config(
-    page_title="الجدول الدوري التفاعلي",
-    page_icon="🧪",
-    layout="wide"
-)
+st.set_page_config("العناصر الكيميائية", "🧪", layout="centered")
+st.title("🔬 البحث عن عنصر كيميائي")
 
-st.title("🧪 مشروع الكيمياء التفاعلي")
+query = st.text_input("اكتب اسم العنصر (عربي / إنجليزي / رمز)")
 
 # -----------------------------------
 # البحث
 # -----------------------------------
 
-query = st.text_input("اكتب اسم العنصر (عربي / إنجليزي / رمز)")
-
 if query:
-    q = normalize(query)
+    q = query.strip().lower()
 
-    # ترجمة تلقائية
-    if query in arabic_map:
-        q = arabic_map[query]
+    if query in arabic_to_english:
+        q = arabic_to_english[query]
 
     found = None
-
     for el in elements:
-        if (
-            q == el["name"].lower()
-            or q == el["symbol"].lower()
-        ):
+        if q == el["name"].lower() or q == el["symbol"].lower():
             found = el
             break
 
     if found:
         st.success("تم العثور على العنصر ✅")
-
         st.write(f"**الاسم:** {found['name']}")
         st.write(f"**الرمز:** {found['symbol']}")
         st.write(f"**العدد الذري:** {found['number']}")
         st.write(f"**الكتلة الذرية:** {found['atomic_mass']}")
         st.write(f"**التصنيف:** {found['category']}")
-        st.write(f"**المجموعة:** {found.get('group', '—')}")
+        st.write(f"**المجموعة:** {found.get('group','—')}")
         st.write(f"**الدورة:** {found['period']}")
-        st.write(f"**الحالة:** {found['phase']}")
+
+        symbol = found["symbol"]
+        occ = occurrence_data.get(symbol, "لا توجد بيانات حالياً.")
+        st.write(f"**أماكن وجوده في الطبيعة:** {occ}")
+
     else:
         st.error("العنصر غير موجود ❌")
 
 # -----------------------------------
-# الجدول الدوري التفاعلي
-# -----------------------------------
-
-st.markdown("---")
-st.subheader("📊 الجدول الدوري التفاعلي")
-
-cols = st.columns(18)
-
-for el in elements:
-    group = el.get("group")
-    if group:
-        color = category_colors.get(el["category"], "#eeeeee")
-
-        with cols[group - 1]:
-            st.markdown(
-                f"""
-                <div style="
-                    background-color:{color};
-                    padding:8px;
-                    margin:2px;
-                    text-align:center;
-                    border-radius:8px;
-                    font-size:12px;">
-                    {el['symbol']}<br>
-                    {el['number']}
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-# -----------------------------------
-# زر عرض صورة الجدول الدوري
+# زر صورة الجدول الدوري
 # -----------------------------------
 
 st.markdown("---")
@@ -168,14 +87,15 @@ if st.button("🖼️ عرض صورة الجدول الدوري"):
     )
 
 # -----------------------------------
-# التوقيع في المنتصف
+# التوقيع
 # -----------------------------------
 
+st.markdown("---")
 st.markdown(
     """
-    <div style="text-align:center; margin-top:40px;">
+    <div style="text-align:center;">
         <h4>الاسم: يوسف</h4>
-        <h4>الصف: عاشر \"ب\"</h4>
+        <h4>الصف: عاشر "ب"</h4>
     </div>
     """,
     unsafe_allow_html=True
