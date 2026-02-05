@@ -7,176 +7,113 @@ import requests
 # -----------------------------------
 
 URL = "https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json"
-data = requests.get(URL).json()
-elements = data["elements"]
+elements = requests.get(URL).json()["elements"]
 
 # -----------------------------------
-# ترجمة تلقائية عربي → إنجليزي
-# (قاعدة واسعة – قابلة للتوسيع)
+# قاموس ترجمة عربي → إنجليزي (118 عنصر)
 # -----------------------------------
 
-arabic_map = {
-    "هيدروجين": "hydrogen",
-    "هيليوم": "helium",
-    "ليثيوم": "lithium",
-    "بيريليوم": "beryllium",
-    "بورون": "boron",
-    "كربون": "carbon",
-    "نيتروجين": "nitrogen",
-    "أكسجين": "oxygen",
-    "اوكسجين": "oxygen",
-    "فلور": "fluorine",
-    "نيون": "neon",
-    "صوديوم": "sodium",
-    "مغنيسيوم": "magnesium",
-    "ألمنيوم": "aluminum",
-    "المنيوم": "aluminum",
-    "سيليكون": "silicon",
-    "فوسفور": "phosphorus",
-    "كبريت": "sulfur",
-    "كلور": "chlorine",
-    "أرجون": "argon",
-    "بوتاسيوم": "potassium",
-    "كالسيوم": "calcium",
-    "حديد": "iron",
-    "نحاس": "copper",
-    "زنك": "zinc",
-    "فضة": "silver",
-    "ذهب": "gold",
-    "زئبق": "mercury",
-    "رصاص": "lead"
-}
-
-# -----------------------------------
-# تنظيف النص
-# -----------------------------------
-
-def normalize(text):
-    text = text.strip().lower()
-    if text.startswith("ال"):
-        text = text[2:]
-    return text
-
-# -----------------------------------
-# ألوان حسب التصنيف
-# -----------------------------------
-
-category_colors = {
-    "alkali metal": "#ff6666",
-    "alkaline earth metal": "#ffdead",
-    "transition metal": "#ffc0c0",
-    "post-transition metal": "#cccccc",
-    "metalloid": "#cccc99",
-    "nonmetal": "#a0ffa0",
-    "halogen": "#ffff99",
-    "noble gas": "#c0ffff",
-    "lanthanide": "#ffbfff",
-    "actinide": "#ff99cc"
+arabic_to_english = {
+    "هيدروجين":"hydrogen","هيليوم":"helium","ليثيوم":"lithium","بيريليوم":"beryllium",
+    "بورون":"boron","كربون":"carbon","نيتروجين":"nitrogen","أكسجين":"oxygen","اوكسجين":"oxygen",
+    "فلور":"fluorine","نيون":"neon","صوديوم":"sodium","مغنيسيوم":"magnesium","ألمنيوم":"aluminum",
+    "المنيوم":"aluminum","سيليكون":"silicon","فوسفور":"phosphorus","كبريت":"sulfur","كلور":"chlorine",
+    "أرجون":"argon","بوتاسيوم":"potassium","كالسيوم":"calcium","سكانديوم":"scandium",
+    "تيتانيوم":"titanium","فاناديوم":"vanadium","كروم":"chromium","منغنيز":"manganese",
+    "حديد":"iron","كوبالت":"cobalt","نيكل":"nickel","نحاس":"copper","زنك":"zinc",
+    "غاليوم":"gallium","جرمانيوم":"germanium","زرنيخ":"arsenic","سيلينيوم":"selenium",
+    "بروم":"bromine","كريبتون":"krypton","روبيديوم":"rubidium","سترونشيوم":"strontium",
+    "إيتريوم":"yttrium","زركونيوم":"zirconium","نيوبيوم":"niobium","موليبدينوم":"molybdenum",
+    "تكنيشيوم":"technetium","روثينيوم":"ruthenium","روديوم":"rhodium","بلاديوم":"palladium",
+    "فضة":"silver","كادميوم":"cadmium","إنديوم":"indium","قصدير":"tin",
+    "أنتيمون":"antimony","تيلوريوم":"tellurium","يود":"iodine","زينون":"xenon",
+    "سيزيوم":"cesium","باريوم":"barium","لانثانوم":"lanthanum","سيريوم":"cerium",
+    "براسيوديميوم":"praseodymium","نيوديميوم":"neodymium","ساماريوم":"samarium",
+    "يوروبيوم":"europium","غادولينيوم":"gadolinium","تيربيوم":"terbium",
+    "ديسبروسيوم":"dysprosium","هولميوم":"holmium","إربيوم":"erbium",
+    "ثوليوم":"thulium","إيتربيوم":"ytterbium","لوتيتيوم":"lutetium",
+    "هافنيوم":"hafnium","تانتالوم":"tantalum","تنغستن":"tungsten",
+    "رينيوم":"rhenium","أوزميوم":"osmium","إيريديوم":"iridium",
+    "بلاتين":"platinum","ذهب":"gold","زئبق":"mercury","ثاليوم":"thallium",
+    "رصاص":"lead","بيسموث":"bismuth","بولونيوم":"polonium",
+    "أستاتين":"astatine","رادون":"radon","فرانسيوم":"francium",
+    "راديوم":"radium","أكتينيوم":"actinium","ثوريوم":"thorium",
+    "يورانيوم":"uranium","بلوتونيوم":"plutonium","أمريسيوم":"americium",
+    "كاليفورنيوم":"californium","أينشتاينيوم":"einsteinium",
+    "فيرميوم":"fermium","مندليفيوم":"mendelevium",
+    "نوبليوم":"nobelium","لورنسيوم":"lawrencium",
+    "رذرفورديوم":"rutherfordium","دوبنيوم":"dubnium",
+    "سيبورغيوم":"seaborgium","بوهريوم":"bohrium",
+    "هاسيوم":"hassium","مايتنيريوم":"meitnerium",
+    "دارمشتاتيوم":"darmstadtium","رونتجينيوم":"roentgenium",
+    "كوبرنيسيوم":"copernicium","نيهونيوم":"nihonium",
+    "فليروفيوم":"flerovium","موسكوفيوم":"moscovium",
+    "ليفيرموريوم":"livermorium","تينيسين":"tennessine",
+    "أوغانيسون":"oganesson"
 }
 
 # -----------------------------------
 # إعداد الصفحة
 # -----------------------------------
 
-st.set_page_config(
-    page_title="الجدول الدوري التفاعلي",
-    page_icon="🧪",
-    layout="wide"
-)
+st.set_page_config("الجدول الدوري", "🧪", layout="wide")
+st.title("🔬 البحث عن عنصر كيميائي")
 
-st.title("🧪 مشروع الكيمياء التفاعلي")
+query = st.text_input("اكتب اسم العنصر (عربي / إنجليزي / رمز)")
 
 # -----------------------------------
 # البحث
 # -----------------------------------
 
-query = st.text_input("اكتب اسم العنصر (عربي / إنجليزي / رمز)")
-
 if query:
-    q = normalize(query)
+    q = query.strip().lower()
 
-    # ترجمة تلقائية
-    if query in arabic_map:
-        q = arabic_map[query]
+    if query in arabic_to_english:
+        q = arabic_to_english[query]
 
     found = None
-
     for el in elements:
-        if (
-            q == el["name"].lower()
-            or q == el["symbol"].lower()
-        ):
+        if q == el["name"].lower() or q == el["symbol"].lower():
             found = el
             break
 
     if found:
         st.success("تم العثور على العنصر ✅")
-
         st.write(f"**الاسم:** {found['name']}")
         st.write(f"**الرمز:** {found['symbol']}")
         st.write(f"**العدد الذري:** {found['number']}")
         st.write(f"**الكتلة الذرية:** {found['atomic_mass']}")
         st.write(f"**التصنيف:** {found['category']}")
-        st.write(f"**المجموعة:** {found.get('group', '—')}")
+        st.write(f"**المجموعة:** {found.get('group','—')}")
         st.write(f"**الدورة:** {found['period']}")
-        st.write(f"**الحالة:** {found['phase']}")
     else:
         st.error("العنصر غير موجود ❌")
 
 # -----------------------------------
-# الجدول الدوري التفاعلي
+# جدول دوري تفاعلي (بدون ألوان)
 # -----------------------------------
 
 st.markdown("---")
-st.subheader("📊 الجدول الدوري التفاعلي")
+st.subheader("📊 الجدول الدوري")
 
 cols = st.columns(18)
-
 for el in elements:
-    group = el.get("group")
-    if group:
-        color = category_colors.get(el["category"], "#eeeeee")
-
-        with cols[group - 1]:
+    if el.get("group"):
+        with cols[el["group"] - 1]:
             st.markdown(
-                f"""
-                <div style="
-                    background-color:{color};
-                    padding:8px;
-                    margin:2px;
-                    text-align:center;
-                    border-radius:8px;
-                    font-size:12px;">
-                    {el['symbol']}<br>
-                    {el['number']}
-                </div>
-                """,
+                f"<div style='border:1px solid #ccc;padding:6px;text-align:center;'>"
+                f"{el['symbol']}<br>{el['number']}</div>",
                 unsafe_allow_html=True
             )
 
 # -----------------------------------
-# زر عرض صورة الجدول الدوري
+# صورة الجدول الدوري
 # -----------------------------------
 
 st.markdown("---")
-
 if st.button("🖼️ عرض صورة الجدول الدوري"):
-    st.image(
-        "periodic_table.png",
-        caption="الجدول الدوري",
-        use_container_width=True
-    )
+    st.image("periodic_table.png", use_container_width=True)
 
-# -----------------------------------
-# التوقيع في المنتصف
-# -----------------------------------
-
-st.markdown(
-    """
-    <div style="text-align:center; margin-top:40px;">
-        <h4>الاسم: يوسف</h4>
-        <h4>الصف: عاشر \"ب\"</h4>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("---")
+st.write("الاسم: يوسف")
+st.write("الصف: عاشر \"ب\"")
