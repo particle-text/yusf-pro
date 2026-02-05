@@ -57,7 +57,22 @@ def normalize(text):
         text = text[2:]
     return text
 
+# -----------------------------------
+# ألوان حسب التصنيف
+# -----------------------------------
 
+category_colors = {
+    "alkali metal": "#ff6666",
+    "alkaline earth metal": "#ffdead",
+    "transition metal": "#ffc0c0",
+    "post-transition metal": "#cccccc",
+    "metalloid": "#cccc99",
+    "nonmetal": "#a0ffa0",
+    "halogen": "#ffff99",
+    "noble gas": "#c0ffff",
+    "lanthanide": "#ffbfff",
+    "actinide": "#ff99cc"
+}
 
 # -----------------------------------
 # إعداد الصفحة
@@ -165,4 +180,3 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
