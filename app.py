@@ -10,7 +10,7 @@ URL = "https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master
 elements = requests.get(URL).json()["elements"]
 
 # -----------------------------------
-# قاموس ترجمة عربي → إنجليزي (118 عنصر)
+# ترجمة عربي → إنجليزي (كل العناصر)
 # -----------------------------------
 
 arabic_to_english = {
@@ -56,7 +56,7 @@ arabic_to_english = {
 # إعداد الصفحة
 # -----------------------------------
 
-st.set_page_config("الجدول الدوري", "🧪", layout="wide")
+st.set_page_config("العناصر الكيميائية", "🧪", layout="centered")
 st.title("🔬 البحث عن عنصر كيميائي")
 
 query = st.text_input("اكتب اسم العنصر (عربي / إنجليزي / رمز)")
@@ -90,30 +90,29 @@ if query:
         st.error("العنصر غير موجود ❌")
 
 # -----------------------------------
-# جدول دوري تفاعلي (بدون ألوان)
+# زر عرض صورة الجدول الدوري فقط
 # -----------------------------------
 
 st.markdown("---")
-st.subheader("📊 الجدول الدوري")
 
-cols = st.columns(18)
-for el in elements:
-    if el.get("group"):
-        with cols[el["group"] - 1]:
-            st.markdown(
-                f"<div style='border:1px solid #ccc;padding:6px;text-align:center;'>"
-                f"{el['symbol']}<br>{el['number']}</div>",
-                unsafe_allow_html=True
-            )
-
-# -----------------------------------
-# صورة الجدول الدوري
-# -----------------------------------
-
-st.markdown("---")
 if st.button("🖼️ عرض صورة الجدول الدوري"):
-    st.image("periodic_table.png", use_container_width=True)
+    st.image(
+        "periodic_table.png",
+        caption="الجدول الدوري",
+        use_container_width=True
+    )
+
+# -----------------------------------
+# التوقيع
+# -----------------------------------
 
 st.markdown("---")
-st.write("الاسم: يوسف")
-st.write("الصف: عاشر \"ب\"")
+st.markdown(
+    """
+    <div style="text-align:center;">
+        <h4>الاسم: يوسف</h4>
+        <h4>الصف: عاشر "ب"</h4>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
